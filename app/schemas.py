@@ -84,6 +84,71 @@ class CrawlFailureOut(BaseModel):
     status: int | None
 
 
+# --------------------------------------------------------------------------- #
+# 抄表整理 API
+# --------------------------------------------------------------------------- #
+class MeterRequest(BaseModel):
+    index_url: str = Field(
+        min_length=1, description="抄表站目录首页 URL，支持 http/https/file"
+    )
+    year: int = Field(ge=2000, le=2100, description="需要还原逐月用量的年份")
+    timeout_seconds: float = Field(default=8.0, ge=1.0, le=30.0)
+
+    @field_validator("index_url")
+    @classmethod
+    def _validate_scheme(cls, value: str) -> str:
+        value = value.strip()
+        if not value.startswith(("http://", "https://", "file://")):
+            raise ValueError("index_url 仅支持 http://、https:// 或 file:// 协议")
+        return value
+
+
+class MeterSegmentOut(BaseModel):
+    meter_id: str
+    start_time: str
+    end_time: str
+    peak_start_kwh: float | None
+    peak_end_kwh: float | None
+    valley_start_kwh: float | None
+    valley_end_kwh: float | None
+    peak_start_record_id: str | None
+    peak_end_record_id: str | None
+    valley_start_record_id: str | None
+    valley_end_record_id: str | None
+
+
+class MeterMonthOut(BaseModel):
+    month: int
+    available: bool
+    peak_kwh: float | None
+    valley_kwh: float | None
+    reasons: list[str]
+    source_record_ids: list[str]
+    source_urls: list[str]
+    segments: list[MeterSegmentOut]
+
+
+class MeterMonthlyUsageOut(BaseModel):
+    """形状与比价接口 MonthlyUsage 一致，可直接传给 /compare-plans。"""
+    month: int
+    peak_kwh: float
+    valley_kwh: float
+
+
+class MeterResponse(BaseModel):
+    index_url: str
+    year: int
+    comparable: bool = Field(description="整份 12 个月用量是否可直接用于比价")
+    unavailable_months: list[int]
+    crawl: dict
+    duplicates: list[str] = Field(description="同表同刻的重复记录 id（已只计一次）")
+    failures: list[CrawlFailureOut]
+    monthly_usage: list[MeterMonthlyUsageOut] = Field(
+        description="仅包含可用月份；不可用月份不填零，见 months"
+    )
+    months: list[MeterMonthOut]
+
+
 class CompareResponse(BaseModel):
     request_region: str
     list_url: str

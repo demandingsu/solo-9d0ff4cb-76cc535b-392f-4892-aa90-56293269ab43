@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>门店抄表站 - 峰谷累计抄表记录 第1页</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>门店抄表站</h1>
+  <p>演示用本地抄表站 · 电表峰谷累计读数（数据均为虚构示例）</p>
+</header>
+<main data-page="meter-list" data-page-no="1" data-year="2025">
+  <h2>峰谷抄表记录（第 1 页）</h2>
+  <table class="meter-table" data-meter-records>
+    <thead>
+      <tr>
+        <th>记录号</th><th>电表编号</th><th>抄表时刻</th><th>事件</th>
+        <th>峰段累计 (kWh)</th><th>谷段累计 (kWh)</th><th>来源页</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-record-id="R-2025-0001" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-01-01" data-event="routine"
+          data-peak-kwh="12000.0" data-valley-kwh="18000.0">
+        <td>R-2025-0001</td><td>M-PEAK-01</td><td>2025-01-01 00:00</td><td>常规抄表</td>
+        <td>12000.0</td><td>18000.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0002" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-02-01" data-event="routine"
+          data-peak-kwh="12260.0" data-valley-kwh="18360.0">
+        <td>R-2025-0002</td><td>M-PEAK-01</td><td>2025-02-01 00:00</td><td>常规抄表</td>
+        <td>12260.0</td><td>18360.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0003" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-03-01" data-event="routine"
+          data-peak-kwh="12500.0" data-valley-kwh="18700.0">
+        <td>R-2025-0003</td><td>M-PEAK-01</td><td>2025-03-01 00:00</td><td>常规抄表</td>
+        <td>12500.0</td><td>18700.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0004" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-04-01" data-event="routine"
+          data-peak-kwh="12780.0" data-valley-kwh="19080.0">
+        <td>R-2025-0004</td><td>M-PEAK-01</td><td>2025-04-01 00:00</td><td>常规抄表</td>
+        <td>12780.0</td><td>19080.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0005" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-05-01" data-event="routine"
+          data-peak-kwh="13080.0" data-valley-kwh="19480.0">
+        <td>R-2025-0005</td><td>M-PEAK-01</td><td>2025-05-01 00:00</td><td>常规抄表</td>
+        <td>13080.0</td><td>19480.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0006" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-06-01" data-event="routine"
+          data-peak-kwh="13410.0" data-valley-kwh="19910.0">
+        <td>R-2025-0006</td><td>M-PEAK-01</td><td>2025-06-01 00:00</td><td>常规抄表</td>
+        <td>13410.0</td><td>19910.0</td><td>第1页</td>
+      </tr>
+      <!-- 6 月 15 日月中换表：旧表止码 + 新表起码（同一时刻成对出现） -->
+      <tr data-record-id="R-2025-0007" data-meter-id="M-PEAK-01"
+          data-reading-time="2025-06-15" data-event="replace_stop"
+          data-peak-kwh="13590.0" data-valley-kwh="20150.0">
+        <td>R-2025-0007</td><td>M-PEAK-01</td><td>2025-06-15 10:00</td><td>换表止码（旧表）</td>
+        <td>13590.0</td><td>20150.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0008" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-06-15" data-event="replace_start"
+          data-peak-kwh="0.0" data-valley-kwh="0.0">
+        <td>R-2025-0008</td><td>M-PEAK-02</td><td>2025-06-15 10:00</td><td>换表起码（新表）</td>
+        <td>0.0</td><td>0.0</td><td>第1页</td>
+      </tr>
+      <tr data-record-id="R-2025-0009" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-07-01" data-event="routine"
+          data-peak-kwh="210.0" data-valley-kwh="280.0">
+        <td>R-2025-0009</td><td>M-PEAK-02</td><td>2025-07-01 00:00</td><td>常规抄表</td>
+        <td>210.0</td><td>280.0</td><td>第1页</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav class="pagination" data-pagination>
+    <span>第 1 页 / 共 3 页</span>
+    <a rel="next" href="page-2.html">下一页 &raquo;</a>
+  </nav>
+</main>
+</body>
+</html>

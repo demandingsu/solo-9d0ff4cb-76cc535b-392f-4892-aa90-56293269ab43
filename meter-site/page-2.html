@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>门店抄表站 - 峰谷累计抄表记录 第2页</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>门店抄表站</h1>
+  <p>演示用本地抄表站 · 电表峰谷累计读数（数据均为虚构示例）</p>
+</header>
+<main data-page="meter-list" data-page-no="2" data-year="2025">
+  <h2>峰谷抄表记录（第 2 页）</h2>
+  <table class="meter-table" data-meter-records>
+    <thead>
+      <tr>
+        <th>记录号</th><th>电表编号</th><th>抄表时刻</th><th>事件</th>
+        <th>峰段累计 (kWh)</th><th>谷段累计 (kWh)</th><th>来源页</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-record-id="R-2025-0010" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-08-01" data-event="routine"
+          data-peak-kwh="630.0" data-valley-kwh="800.0">
+        <td>R-2025-0010</td><td>M-PEAK-02</td><td>2025-08-01 00:00</td><td>常规抄表</td>
+        <td>630.0</td><td>800.0</td><td>第2页</td>
+      </tr>
+      <!-- 同表同刻读数冲突：与 R-2025-0010 的峰谷累计均不一致，8 月 1 日读数两侧月份不可用 -->
+      <tr data-record-id="R-2025-0011" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-08-01" data-event="routine"
+          data-peak-kwh="635.0" data-valley-kwh="805.0">
+        <td>R-2025-0011</td><td>M-PEAK-02</td><td>2025-08-01 00:00</td><td>常规抄表（冲突）</td>
+        <td>635.0</td><td>805.0</td><td>第2页</td>
+      </tr>
+      <tr data-record-id="R-2025-0012" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-09-01" data-event="routine"
+          data-peak-kwh="1040.0" data-valley-kwh="1320.0">
+        <td>R-2025-0012</td><td>M-PEAK-02</td><td>2025-09-01 00:00</td><td>常规抄表</td>
+        <td>1040.0</td><td>1320.0</td><td>第2页</td>
+      </tr>
+      <!-- 累计值倒退：10 月 1 日峰谷累计均低于 9 月 1 日，9 月用量无法核算 -->
+      <tr data-record-id="R-2025-0013" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-10-01" data-event="routine"
+          data-peak-kwh="990.0" data-valley-kwh="1260.0">
+        <td>R-2025-0013</td><td>M-PEAK-02</td><td>2025-10-01 00:00</td><td>常规抄表（倒退）</td>
+        <td>990.0</td><td>1260.0</td><td>第2页</td>
+      </tr>
+      <!-- R-2025-0014（11 月 1 日月界抄表）缺失，10、11 月划界记录不完整 -->
+      <!-- R-2025-0015 与 R-2025-0010 同表同刻且读数完全相同：跨页重复，只计一次 -->
+      <tr data-record-id="R-2025-0015" data-meter-id="M-PEAK-02"
+          data-reading-time="2025-08-01" data-event="routine"
+          data-peak-kwh="630.0" data-valley-kwh="800.0">
+        <td>R-2025-0015</td><td>M-PEAK-02</td><td>2025-08-01 00:00</td><td>常规抄表（重复）</td>
+        <td>630.0</td><td>800.0</td><td>第2页</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav class="pagination" data-pagination>
+    <a rel="prev" href="index.html">&laquo; 上一页</a>
+    <span>第 2 页 / 共 3 页</span>
+    <!-- 第 3 页（page-3.html）故意不存在，演示分页抓取失败：地址须登记且整份不可比价 -->
+    <a rel="next" href="page-3.html">下一页 &raquo;</a>
+  </nav>
+</main>
+</body>
+</html>

@@ -10,11 +10,17 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from .billing import annual_total, bill_plan, check_eligibility
+from .meter import crawl_meter_site, reconstruct_year
 from .schemas import (
     CompareRequest,
     CompareResponse,
     CrawlFailureOut,
     ExcludedPlanOut,
+    MeterMonthOut,
+    MeterMonthlyUsageOut,
+    MeterRequest,
+    MeterResponse,
+    MeterSegmentOut,
     MonthlyBillOut,
     RankedPlanOut,
     TierChargeOut,
@@ -139,4 +145,99 @@ def compare_plans(request: CompareRequest) -> CompareResponse:
         ranked_plans=ranked,
         excluded_plans=excluded,
         failures=failures,
+    )
+
+
+def _to_float(value) -> float | None:
+    return None if value is None else float(value)
+
+
+@app.post("/api/v1/meter-usage", response_model=MeterResponse)
+def organize_meter_usage(request: MeterRequest) -> MeterResponse:
+    """抓取本地抄表站分页记录，还原指定年份 12 个月的峰谷用量。"""
+    crawl = crawl_meter_site(request.index_url, timeout=request.timeout_seconds)
+    fetch_failed = bool(crawl.failures)
+    reconstructions = reconstruct_year(crawl.records, request.year, fetch_failed)
+
+    # 记录 id -> 来源页面地址，用于逐月列出读数来源
+    source_by_record: dict[str, str] = {
+        record.record_id: record.source_url for record in crawl.records
+    }
+
+    months_out: list[MeterMonthOut] = []
+    monthly_usage: list[MeterMonthlyUsageOut] = []
+    unavailable: list[int] = []
+
+    for item in reconstructions:
+        source_urls = sorted(
+            {
+                source_by_record[rid]
+                for rid in item.record_ids
+                if rid in source_by_record
+            }
+        )
+        segments_out = [
+            MeterSegmentOut(
+                meter_id=seg.meter_id,
+                start_time=seg.start_time.isoformat(),
+                end_time=seg.end_time.isoformat(),
+                peak_start_kwh=_to_float(seg.peak_start),
+                peak_end_kwh=_to_float(seg.peak_end),
+                valley_start_kwh=_to_float(seg.valley_start),
+                valley_end_kwh=_to_float(seg.valley_end),
+                peak_start_record_id=seg.peak_start_record_id,
+                peak_end_record_id=seg.peak_end_record_id,
+                valley_start_record_id=seg.valley_start_record_id,
+                valley_end_record_id=seg.valley_end_record_id,
+            )
+            for seg in item.segments
+        ]
+        months_out.append(
+            MeterMonthOut(
+                month=item.month,
+                available=item.available,
+                peak_kwh=_to_float(item.peak_kwh),
+                valley_kwh=_to_float(item.valley_kwh),
+                reasons=item.reasons,
+                source_record_ids=item.record_ids,
+                source_urls=source_urls,
+                segments=segments_out,
+            )
+        )
+        if item.available and item.peak_kwh is not None and item.valley_kwh is not None:
+            # 只输出可复核的月份；不可用月份绝不以零值混入比价输入
+            monthly_usage.append(
+                MeterMonthlyUsageOut(
+                    month=item.month,
+                    peak_kwh=float(item.peak_kwh),
+                    valley_kwh=float(item.valley_kwh),
+                )
+            )
+        else:
+            unavailable.append(item.month)
+
+    failures = [
+        CrawlFailureOut(url=f.url, stage=f.stage, reason=f.reason, status=f.status)
+        for f in crawl.failures
+    ]
+
+    # 存在抓取失败或任一月不可用时，整份用量不得标为可比价
+    comparable = not fetch_failed and not unavailable
+
+    return MeterResponse(
+        index_url=request.index_url,
+        year=request.year,
+        comparable=comparable,
+        unavailable_months=unavailable,
+        crawl={
+            "visited_urls": crawl.visited_urls,
+            "pages_visited": len(crawl.visited_urls),
+            "records_crawled": len(crawl.records),
+            "duplicate_count": len(crawl.duplicate_record_ids),
+            "failure_count": len(failures),
+        },
+        duplicates=crawl.duplicate_record_ids,
+        failures=failures,
+        monthly_usage=monthly_usage,
+        months=months_out,
     )
